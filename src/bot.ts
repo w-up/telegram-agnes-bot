@@ -40,31 +40,31 @@ bot.command("model", (ctx) => {
 });
 
 // /version 报告构建版本与限流配置（用于确认 Railway 跑的是哪份代码）
-const BUILD_TAG = "v4-webhook-1per60s";
+const BUILD_TAG = "v5-webhook-1per30s";
 bot.command("version", (ctx) => {
   ctx.reply(
     `🏷️ 构建标记: ${BUILD_TAG}\n` +
     `⚡ 模式: Webhook（单实例，彻底消除 409）\n` +
-    `⏱️ 限流: 每 60 秒最多 1 条（防止 AI 思考期间连发）\n` +
+    `⏱️ 限流: 每 30 秒最多 1 条（防止 AI 思考期间连发）\n` +
     `🤖 模型: ${process.env.AIHUB_MODEL || "gpt-5.5"}\n` +
     `📦 Node: ${process.version}`
   );
 });
 
 // 处理文本消息
-// 速率限制：每个用户每分钟最多 1 条（防止 AI 思考期间连发导致多次调用）
+// 速率限制：每个用户每 30 秒最多 1 条（防止 AI 思考期间连发导致多次调用）
 bot.on(
   "message:text",
   limit({
-    // 时间窗口 60 秒
-    timeFrame: 60_000,
+    // 时间窗口 30 秒
+    timeFrame: 30_000,
     // 窗口内最多 1 次
     limit: 1,
     // 按 Telegram 用户 ID 独立计数
     keyGenerator: (ctx) => ctx.from?.id.toString(),
     // 超限时的提示
     onLimitExceeded: async (ctx) => {
-      await ctx.reply("⏳ 请稍等，AI 正在思考中。每分钟只能发送 1 条消息，请等待回复后再继续对话");
+      await ctx.reply("⏳ 请稍等，AI 正在思考中。每 30 秒只能发送 1 条消息，请等待回复后再继续对话");
     },
   }),
   async (ctx) => {
