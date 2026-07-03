@@ -133,7 +133,16 @@ app.use(express.json());
 app.post(`/webhook/${process.env.BOT_TOKEN}`, webhookCallback(bot, "express"));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✅ Webhook 服务器已启动，监听端口 ${PORT}`);
   console.log(`📍 Webhook 路径: /webhook/${process.env.BOT_TOKEN?.slice(0, 10)}...`);
+  
+  // 注册命令菜单（用户点击输入框 "/" 按钮可见）
+  await bot.api.setMyCommands([
+    { command: "start", description: "查看欢迎菜单" },
+    { command: "clear", description: "清空对话历史" },
+    { command: "model", description: "查看当前模型" },
+    { command: "version", description: "查看构建版本" },
+  ]);
+  console.log("📋 命令菜单已注册");
 });
