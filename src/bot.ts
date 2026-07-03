@@ -21,7 +21,8 @@ bot.command("start", (ctx) => {
     "👋 欢迎使用 Agnes AI Bot！\n\n" +
     "直接发送消息与我对话\n" +
     "/clear - 清空对话历史\n" +
-    "/model - 查看当前模型"
+    "/model - 查看当前模型\n" +
+    "/version - 查看构建版本"
   );
 });
 
@@ -35,6 +36,17 @@ bot.command("clear", (ctx) => {
 bot.command("model", (ctx) => {
   const model = process.env.AIHUB_MODEL || "gpt-5.5";
   ctx.reply(`🤖 当前模型: ${model}`);
+});
+
+// /version 报告构建版本与限流配置（用于确认 Railway 跑的是哪份代码）
+const BUILD_TAG = "v2-ratelimit-5per60s";
+bot.command("version", (ctx) => {
+  ctx.reply(
+    `🏷️ 构建标记: ${BUILD_TAG}\n` +
+    `⏱️ 限流: 每 60 秒最多 5 条（已启用 @grammyjs/ratelimiter）\n` +
+    `🤖 模型: ${process.env.AIHUB_MODEL || "gpt-5.5"}\n` +
+    `📦 Node: ${process.version}`
+  );
 });
 
 // 处理文本消息
