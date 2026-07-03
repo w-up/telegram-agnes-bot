@@ -1,0 +1,29 @@
+{
+  "name": "telegram-agnes-bot",
+  "version": "1.0.0",
+  "description": "Telegram Bot powered by Agnes AI",
+  "main": "dist/bot.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/bot.ts",
+    "start": "tsx src/bot.ts",
+    "build": "tsc",
+    "prod": "node dist/bot.js"
+  },
+  "keywords": ["telegram", "bot", "ai", "agnes"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "grammy": "^1.30.0",
+    "openai": "^4.73.1",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
