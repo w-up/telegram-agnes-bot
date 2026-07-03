@@ -1,6 +1,7 @@
-import { Bot } from "grammy";
+import { Bot, webhookCallback } from "grammy";
 import { limit } from "@grammyjs/ratelimiter";
 import OpenAI from "openai";
+import express from "express";
 import "dotenv/config";
 
 // 初始化 Telegram Bot
@@ -39,10 +40,11 @@ bot.command("model", (ctx) => {
 });
 
 // /version 报告构建版本与限流配置（用于确认 Railway 跑的是哪份代码）
-const BUILD_TAG = "v2-ratelimit-5per60s";
+const BUILD_TAG = "v3-webhook-5per60s";
 bot.command("version", (ctx) => {
   ctx.reply(
     `🏷️ 构建标记: ${BUILD_TAG}\n` +
+    `⚡ 模式: Webhook（单实例，彻底消除 409）\n` +
     `⏱️ 限流: 每 60 秒最多 5 条（已启用 @grammyjs/ratelimiter）\n` +
     `🤖 模型: ${process.env.AIHUB_MODEL || "gpt-5.5"}\n` +
     `📦 Node: ${process.version}`
@@ -118,7 +120,20 @@ bot.catch((err) => {
   console.error("Bot 错误:", err);
 });
 
-// 启动 Bot
-bot.start({
-  onStart: () => console.log("✅ Agnes Bot 已启动"),
+// Webhook 模式启动（替换 long polling）
+const app = express();
+
+// 健康检查端点（Railway 用来判断服务是否存活）
+app.get("/", (req, res) => {
+  res.send("✅ Agnes Bot Webhook Server Running");
+});
+
+// Telegram Webhook 端点
+app.use(express.json());
+app.post(`/webhook/${process.env.BOT_TOKEN}`, webhookCallback(bot, "express"));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Webhook 服务器已启动，监听端口 ${PORT}`);
+  console.log(`📍 Webhook 路径: /webhook/${process.env.BOT_TOKEN?.slice(0, 10)}...`);
 });
